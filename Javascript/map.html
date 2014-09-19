@@ -11,14 +11,23 @@
 
 <body>
 
-    <div id="myMap" style="border: none; margin: auto; width: 1000px; height:1000px;"></div>
-
+    <div id="myMap" style="border: none; margin: auto; width: 500px; height:500px;"></div>
+    <div>
+        Click and drag to draw a bounding rectangle and create your own data set.
+    </div>
+    <a id="downloadLink"></a>
+    <div>
+        <a href="#" onclick="generateRandom(100);">Generate Random 100</a>
+    </div>
+    <div>
+        <a href="#" onclick="generateRandom(1000);">Generate Random 1000</a>
+    </div>
 </body>
 
 <script type="text/javascript">
 
-    var WIDTH = 1000;
-    var HEIGHT = 1000;
+    var WIDTH = 500;
+    var HEIGHT = 500;
     var renderer = new THREE.WebGLRenderer();
     var scene = new THREE.Scene();
     var camera;
@@ -168,7 +177,7 @@
         console.log("captured " + boundedCities.length + " cities");
 
         if (boundedCities.length > 0) {
-            saveTextAsFile(outputCities(boundedCities), "bounded.txt");
+            setDownloadTextLink(outputCities(boundedCities), "" + boundedCities.length + "_cities.txt");
         }
     }
 
@@ -201,33 +210,73 @@
         }
     }
     
-    function saveTextAsFile(textToWrite, fileName) {
+    function setDownloadTextLink(textToWrite, fileName) {
         var textFileAsBlob = new Blob([textToWrite], { type: 'text/plain' });
 
-        var downloadLink = document.createElement("a");
+        var downloadLink = document.getElementById('downloadLink');//document.createElement("a");
         downloadLink.download = fileName;
-        downloadLink.innerHTML = "Download File";
+        downloadLink.innerHTML = fileName;
         if (window.webkitURL != null) {
             // Chrome allows the link to be clicked
             // without actually adding it to the DOM.
             downloadLink.href = window.webkitURL.createObjectURL(textFileAsBlob);
+            //document.body.appendChild(downloadLink);
         }
         else {
             // Firefox requires the link to be added to the DOM
             // before it can be clicked.
             downloadLink.href = window.URL.createObjectURL(textFileAsBlob);
-            downloadLink.onclick = destroyClickedElement;
-            downloadLink.style.display = "none";
-            document.body.appendChild(downloadLink);
+            //downloadLink.onclick = destroyClickedElement;
+            //downloadLink.style.display = "none";
+            //document.body.appendChild(downloadLink);
         }
 
-        downloadLink.click();
+        //downloadLink.click();
     }
 
-    function destroyClickedElement(event) {
-        document.body.removeChild(event.target);
+    //function destroyClickedElement(event) {
+    //    document.body.removeChild(event.target);
+    //}
+
+    function generateRandom(count) {
+        count = Math.min(count, allCities.length);
+        randArray = new Array(count);
+        var randPermutation = shuffle(genIndexArray(allCities.length));
+        for (var i = 0; i < count; i++) {
+            randArray[i] = allCities[randPermutation[i]];
+        }
+
+        if (count > 0) {
+            setDownloadTextLink(outputCities(randArray), "" + count + "_random_cities.txt");
+        }
     }
 
+    function genIndexArray(n) {
+        var arr = new Array(n);
+        for (var i = 0; i < n; i++) {
+            arr[i] = i;
+        }
+        return arr;
+    }
+
+    function shuffle(array) {
+        var currentIndex = array.length, temporaryValue, randomIndex;
+
+        // While there remain elements to shuffle...
+        while (0 !== currentIndex) {
+
+            // Pick a remaining element...
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex -= 1;
+
+            // And swap it with the current element.
+            temporaryValue = array[currentIndex];
+            array[currentIndex] = array[randomIndex];
+            array[randomIndex] = temporaryValue;
+        }
+
+        return array;
+    }
 
     function render() {
         requestAnimationFrame(render);
