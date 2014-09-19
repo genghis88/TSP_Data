@@ -1,0 +1,244 @@
+<html>
+
+<head>
+    <title>TSP: City Map</title>
+    <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r68/three.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+
+</head>
+
+<body>
+
+    <div id="myMap" style="border: none; margin: auto; width: 1000px; height:1000px;"></div>
+
+</body>
+
+<script type="text/javascript">
+
+    var WIDTH = 1000;
+    var HEIGHT = 1000;
+    var renderer = new THREE.WebGLRenderer();
+    var scene = new THREE.Scene();
+    var camera;
+
+    function setupMap() {
+       
+        renderer.setSize(WIDTH, HEIGHT);
+
+        camera = new THREE.OrthographicCamera(WIDTH / -2, WIDTH / 2, HEIGHT / 2, HEIGHT / -2, 1, 1000);
+        camera.position.set(0, 0, 1000);
+        camera.lookAt(new THREE.Vector3(0, 0, 0));
+        
+        scene.add(camera);
+
+        var mapCanvas = $('#myMap');
+        mapCanvas.append(renderer.domElement);
+        document.addEventListener('mousedown', onDocumentMouseDown, false);
+        document.addEventListener('mouseup', onDocumentMouseUp, false);
+        document.addEventListener('mousemove', onDocumentMouseMove, false);
+    }
+
+    var material = new THREE.LineBasicMaterial({
+        color: 0xFFFFFF
+    });
+
+    function city(x, y) {
+        var segmentCount = 3,
+         radius = 3,
+         geometry = new THREE.Geometry();
+
+        for (var i = 0; i <= segmentCount; i++) {
+            var theta = (i / segmentCount) * Math.PI * 2;
+            geometry.vertices.push(
+                new THREE.Vector3(
+                    Math.cos(theta) * radius + x,
+                    Math.sin(theta) * radius + y,
+                    0));
+        }
+        var line = new THREE.Line(geometry, material);
+        return line;
+    }
+
+    var allCities;
+    var scale, xOffset, yOffset;
+
+    function renderSampleCities(cities) {
+
+        // Find min, max
+        var minX = Number.MAX_VALUE;
+        var maxX = Number.MIN_VALUE;
+        var minY = Number.MAX_VALUE;
+        var maxY = Number.MIN_VALUE;
+
+        for (var i in cities) {
+            var c = cities[i];
+            if(c.x < minX){ minX = c.x; }
+            if(c.x > maxX){ maxX = c.x; }
+            if(c.y < minY){ minY = c.y; }
+            if(c.y > maxY){ maxY = c.y; }
+        }
+        console.log('x: ' + minX + ' - ' + maxX);
+        console.log('y: ' + minY + ' - ' + maxY);
+
+        xOffset = ((maxX - minX) / 2) + minX;
+        yOffset = ((maxY - minY) / 2) + minY;
+        console.log('offset: ' + xOffset + ' , ' + yOffset);
+
+        scale = Math.min(WIDTH / (maxX - minX), HEIGHT / (maxY - minY));
+        console.log('scale: ' + scale);
+
+        var maxCount = 1000;
+        for (var n = 0; n < maxCount; n++) {
+
+            var i = Math.floor(Math.random() * cities.length);
+            var c = cities[i];
+            scene.add(city((c.x - xOffset) * scale * -1, (c.y - yOffset) * scale));
+        }
+    }
+
+    function loadAllCities() {
+
+        $.ajax({
+            url: "./usa115475.tsp",
+            dataType: "text",
+            success: function (result) {
+
+                var recs = result.split('\n');
+                var cityArray = new Array(50);
+
+                var maxCount = 500000;
+                for (var c in recs) {
+                    var vals = recs[c].split(' ');
+                    if (!isNaN(parseInt(vals[0]))) {
+                        var n = parseInt(vals[0]);
+                        var y = parseFloat(vals[1]);
+                        var x = parseFloat(vals[2]);
+                        cityArray[n - 1] = { n: n, x: x, y: y };
+                    }
+                    if (maxCount-- < 0) {
+                        break;
+                    }
+                }
+                allCities = cityArray;
+                console.log('Parsed ' + cityArray.length + ' cities');
+                renderSampleCities(cityArray);
+            }
+        });
+    }
+
+    var mouse = { x: 0, y: 0 };
+    var mouseDown = { x: 0, y: 0 };
+    var isMouseDown = false;
+    var boundLine;
+    function onDocumentMouseDown( event ) 
+    {
+        var canvas = $('#myMap')[0];
+        mouse.x = (event.clientX - document.documentElement.scrollLeft - canvas.offsetLeft) / WIDTH * 2 - 1;
+        mouse.y = (event.clientY - document.documentElement.scrollTop - canvas.offsetTop) / HEIGHT * -2 + 1;
+	
+        mouseDown.x = mouse.x;
+        mouseDown.y = mouse.y;
+
+        console.log("Down. " + mouse.x + " , " + mouse.y);
+        isMouseDown = true;
+    }
+
+    function onDocumentMouseUp(event) {
+        isMouseDown = false;
+       
+        // Save all of the cities of interest in the bounding box to text
+        var minX, maxX, minY, maxY;
+        minX = (Math.min(mouse.x * -1, mouseDown.x * -1) * WIDTH / scale) + xOffset;
+        maxX = (Math.max(mouse.x * -1, mouseDown.x * -1) * WIDTH / scale) + xOffset;
+        minY = (Math.min(mouse.y, mouseDown.y) * HEIGHT / scale) + yOffset;
+        maxY = (Math.max(mouse.y, mouseDown.y) * HEIGHT / scale) + yOffset;
+
+        console.log('bound x: ' + minX + ' - ' + maxX);
+        console.log('bound y: ' + minY + ' - ' + maxY);
+        var boundedCities = [];
+        
+        for (var i in allCities) {
+            var c = allCities[i];
+            if (c.x >= minX && c.x <= maxX && c.y >= minY && c.y <= maxY) {
+                boundedCities.push(c);
+            }
+        }
+        console.log("captured " + boundedCities.length + " cities");
+
+        if (boundedCities.length > 0) {
+            saveTextAsFile(outputCities(boundedCities), "bounded.txt");
+        }
+    }
+
+    function outputCities(cities) {
+        var outputText = "";
+
+        for (var i in cities) {
+            var c = cities[i];
+            outputText += c.n + " " + c.y + " " + c.x + "\r";
+        }
+        return outputText;
+    }
+
+    function onDocumentMouseMove(event) {
+        if (isMouseDown) {
+            var canvas = $('#myMap')[0];
+            mouse.x = (event.clientX - document.documentElement.scrollLeft - canvas.offsetLeft) / WIDTH * 2 - 1;
+            mouse.y = (event.clientY - document.documentElement.scrollTop - canvas.offsetTop) / HEIGHT * -2 + 1;
+
+            scene.remove(boundLine);
+            var boundGeometry = new THREE.Geometry();
+            boundGeometry.vertices.push(new THREE.Vector3(mouseDown.x * WIDTH / 2, mouseDown.y * HEIGHT / 2, 0));
+            boundGeometry.vertices.push(new THREE.Vector3(mouseDown.x * WIDTH / 2, mouse.y * HEIGHT / 2, 0));
+            boundGeometry.vertices.push(new THREE.Vector3(mouse.x * WIDTH / 2, mouse.y * HEIGHT / 2, 0));
+            boundGeometry.vertices.push(new THREE.Vector3(mouse.x * WIDTH / 2, mouseDown.y * HEIGHT / 2, 0));
+            boundGeometry.vertices.push(new THREE.Vector3(mouseDown.x * WIDTH / 2, mouseDown.y * HEIGHT / 2, 0));
+
+            boundLine = new THREE.Line(boundGeometry, material);
+            scene.add(boundLine);
+        }
+    }
+    
+    function saveTextAsFile(textToWrite, fileName) {
+        var textFileAsBlob = new Blob([textToWrite], { type: 'text/plain' });
+
+        var downloadLink = document.createElement("a");
+        downloadLink.download = fileName;
+        downloadLink.innerHTML = "Download File";
+        if (window.webkitURL != null) {
+            // Chrome allows the link to be clicked
+            // without actually adding it to the DOM.
+            downloadLink.href = window.webkitURL.createObjectURL(textFileAsBlob);
+        }
+        else {
+            // Firefox requires the link to be added to the DOM
+            // before it can be clicked.
+            downloadLink.href = window.URL.createObjectURL(textFileAsBlob);
+            downloadLink.onclick = destroyClickedElement;
+            downloadLink.style.display = "none";
+            document.body.appendChild(downloadLink);
+        }
+
+        downloadLink.click();
+    }
+
+    function destroyClickedElement(event) {
+        document.body.removeChild(event.target);
+    }
+
+
+    function render() {
+        requestAnimationFrame(render);
+        renderer.render(scene, camera);
+    }
+
+    setupMap();
+    render();
+    loadAllCities();
+
+    
+	
+</script>
+</html>
