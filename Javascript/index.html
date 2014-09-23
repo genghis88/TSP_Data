@@ -1,7 +1,7 @@
 <html>
 
 <head>
-    <title>HPS: Travelling Salesman Challenge</title>
+    <title>HPS: Travelling Salesperson Challenge</title>
     <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
@@ -9,57 +9,127 @@
 </head>
 
 <body>
-    <h1>Travelling salesmen sample data</h1>
+    <h2>The Travelling Salesperson Challenge</h2>
     <div>
-        <a href="usa115475.tsp" target="_blank">All Source Data</a>
+        Your goal is to visit each city exactly once and return home (to the first city) by travelling the shortest total distance.  You will write a program that determines the order in which you travel to all of the cities.
+        Your solution will be compared to all of the other travelling salespeople out there and the shortest total distance wins.  Details for the specifcation of your program, the input data, and expected output data are as follows:
+    </div>
+
+    <div>
+        <h3>Executing your program</h3>
+        <ul>
+            <li>
+                Your program must run at the command line and accept <strong>two command line arguments</strong>. For example:
+                <pre>>>travel &lt;input-file&gt; &lt;output-file&gt;
+</pre>  It can be a java program, python, c++, bash script as long as you provide the command to execute it and it accepts the two required command line arguments.
+            </li>
+            <li>
+                The first command-line argument will be a relative path to an <strong>input file</strong>.  This is where you will read the configuration of the cities from.
+                You will find more detail about the input format and sample files below.
+            </li>
+            <li>
+                The second command-line argument will a relative path to an <strong>output file</strong>.  This is where we expect you to write your output.
+                The output should consist of exactly one line with a space-separated list of city ids that represent the tour you will travel.
+            </li>
+            <li>
+                Your output must contain as many numbers as there are (rows) cities in the input.  <strong>Do not list the starting city again at the end.</strong>
+                Any solution that does not contain a valid permutation of the input city ids will be disqualified.
+            </li>
+            <li>Any solution that is not properly formatted according to this specification is subject to disqualification.</li>
+            <li>Your program must execute and terminate within 5 minutes.  Any program still running after 5 minutes will be <strong>forcefully terminated</strong>.  If the program has produced a valid solution at this point, it will be evaluated.</li>
+            <li>Unless otherwise specified, and special arrangements are made ahead of time with the architect team, all programs will be executed on <strong>energon1</strong>.</li>
+        </ul>
     </div>
     <div>
-        <h2>Instructions</h2>
+        <h3>Input data format and samples</h3>
         <ul>
-            <li>Sample data is provided in the same format as the original data source.  Every line consists of [n] [x] [y]</li>
+            <li>All input data is taken directly from the comprehensive University of Waterloo listing located here: <a href="http://www.math.uwaterloo.ca/tsp/data/usa/usa115475.tsp" target="_blank">http://www.math.uwaterloo.ca/tsp/data/usa/usa115475.tsp</a></li>
+            <li>
+                Sample data is provided in the same format as the original data source (except with no extra lines).  Each line corresponds to one city and is represented as <strong>[n] [x] [y]</strong> where <i>n</i> is a positive integer and <i>x</i> and <i>y</i> are floating point numbers.  The three values are separated by a single ASCII space.  For example:
+                <pre>14 31277.947300 86125.779600</pre>
+            </li>
             <li>Sample data is provided at <strong>data/sample_[n].tsp</strong> for 1 &le; n &le; 5</li>
             <li>Test data will be provided at <strong>data/test_[n].tsp</strong> for 1 &le; n &le; 5 (but it's not available yet!)</li>
             <li>Sample data is representative of the form of the test data, but not the content.</li>
         </ul>
     </div>
-    <h3>Sample Data</h3>
-    <ul>
-        <li>
-            Sample 1: 100 cities in bounded box <a href="data/sample_1.tsp" target="_blank">https://files.nyu.edu/ck1456/public/hps/tsp/data/sample_1.tsp</a>
-        </li>
-        <li>
-            Sample 2: 100 cities in bounded box <a href="data/sample_2.tsp" target="_blank">https://files.nyu.edu/ck1456/public/hps/tsp/data/sample_2.tsp</a>
-        </li>
-        <li>
-            Sample 3: 1000 cities in bounded box <a href="data/sample_3.tsp" target="_blank">https://files.nyu.edu/ck1456/public/hps/tsp/data/sample_3.tsp</a>
-        </li>
-        <li>
-            Sample 4: 100 random cities <a href="data/sample_4.tsp" target="_blank">https://files.nyu.edu/ck1456/public/hps/tsp/data/sample_4.tsp</a>
-        </li>
-        <li>
-            Sample 5: 1000 random cities <a href="data/sample_5.tsp" target="_blank">https://files.nyu.edu/ck1456/public/hps/tsp/data/sample_5.tsp</a>
-        </li>
-    </ul>
-    <h3>Test Data</h3>
-    <ul>
-        <li>
-            Test 1:
-        </li>
-        <li>
-            Test 2:
-        </li>
-        <li>
-            Test 3:
-        </li>
-        <li>
-            Test 4:
-        </li>
-        <li>
-            Test 5:
-        </li>
-    </ul>
+    <div>
+        <h3>Sample Data</h3>
+        <ul>
+            <li>
+                Sample 1: 100 cities in bounded box <a href="data/sample_1.tsp" target="_blank">https://files.nyu.edu/ck1456/public/hps/tsp/data/sample_1.tsp</a>
+            </li>
+            <li>
+                Sample 2: 100 cities in bounded box <a href="data/sample_2.tsp" target="_blank">https://files.nyu.edu/ck1456/public/hps/tsp/data/sample_2.tsp</a>
+            </li>
+            <li>
+                Sample 3: 1000 cities in bounded box <a href="data/sample_3.tsp" target="_blank">https://files.nyu.edu/ck1456/public/hps/tsp/data/sample_3.tsp</a>
+            </li>
+            <li>
+                Sample 4: 100 random cities <a href="data/sample_4.tsp" target="_blank">https://files.nyu.edu/ck1456/public/hps/tsp/data/sample_4.tsp</a>
+            </li>
+            <li>
+                Sample 5: 1000 random cities <a href="data/sample_5.tsp" target="_blank">https://files.nyu.edu/ck1456/public/hps/tsp/data/sample_5.tsp</a>
+            </li>
+        </ul>
+        <h3>Test Data</h3>
+        <ul>
+            <li>
+                Test 1:
+            </li>
+            <li>
+                Test 2:
+            </li>
+            <li>
+                Test 3:
+            </li>
+            <li>
+                Test 4:
+            </li>
+            <li>
+                Test 5:
+            </li>
+        </ul>
+    </div>
 
-    <h3>More Data</h3>
-    <div>Want more data to test with?  You can generate your own small sample sets using this really cool <a href="map.html">Map Tool</a></div>
+    <h3>Evaluating Competing Solutions</h3>
 
+    <div>
+        <ul>
+            <li>The score for you solution is the total distance that your proposed tour takes.  You don't have to calculate this, we will calculate this in order to make sure it is done correctly and consistently for all teams.</li>
+            <li>
+                The team with the shortest tour length for a given round gets a score of 1.  All other scores for that round will be expressed as a fraction of the best score.
+                For example: Team A gets a total length of 4000, and Team B gets a total length of 4800.  Team A's normalized score for the round is 1.0 and Team B's is 1.2.  Any team that is disqualified for the round will receive a score of 1.5.
+            </li>
+            <li>There will be 5 final test data sets.</li>
+            <li>The team with the lowest sum total of 5 scores wins big.</li>
+        </ul>
+    </div>
+
+    <div>
+        <h3>FAQ - Frequenty Asked Questions</h3>
+        <h4>Who is behind all of this?</h4>
+        Chris Keitel (ck1456@nyu.edu) and Kumar Prabhu (kumar.prabhu@nyu.edu).  You can blame them for your troubles.  And ask more questions if you have them.
+
+        <div>Will the city ids be in order?</div>
+
+        No, the city ids will not necessarily be in order.  Although they might.
+
+        <h4>What is the most number of cities we have to handle?</h4>
+
+        The original data set has 115,475 cities, so it won't be more than that!  In general, the samples are representative of the data sets that will be provided for the competitive evaluation.
+
+        <h4>Are the cities always numbered 1 ... n?</h4>
+
+        No, the city ids in the sample data correspond precisely to the city ids in the <a href="usa115475.tsp">original full data set</a>.  In this way, each sample and test set is a proper subset of the full USA data set.
+        This prevents ambiguity between test runs and prevents confusion all around.
+
+        <h4>Is there anyway I can make sure my code works before the competition?</h4>
+
+        Yes!  Kumar will tell you how.
+    </div>
+
+    <h3>More Stuff</h3>
+    <div>Still reading?  Want more data to test with?  You can generate your own small sample sets using this really cool <a href="map.html">Map Tool</a></div>
+    <div>You can also visualize your solution here with this<a href="viewer.html">CityViewer Tool</a></div>
 </html>
