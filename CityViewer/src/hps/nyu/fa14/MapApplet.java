@@ -7,13 +7,14 @@ import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 
 /**
  * Double buffering concept from Ken Perlin's Computer Graphics class
  * 
  * @author ck1456@nyu.edu
  */
-public class MapApplet extends Applet implements Runnable, MouseListener {
+public class MapApplet extends Applet implements Runnable {
 
 	private static final long serialVersionUID = 4901830364284199595L;
 
@@ -54,18 +55,28 @@ public class MapApplet extends Applet implements Runnable, MouseListener {
 		}
 	}
 	
+	private final ProblemModel model;
 	
-	CitySet set;
-	Tour tour;
+	private final ControlFrame frame;
+	
+	private CityBounder bounder;
+	
+	public MapApplet(){
+//		model = new ProblemModel(CitySet.LoadFromUrl("https://files.nyu.edu/ck1456/public/hps/tsp/usa115475.tsp"));
+		model = new ProblemModel(CitySet.LoadFromUrl("https://files.nyu.edu/ck1456/public/hps/tsp/data/sample_5.tsp"));
+		model.currentCities = model.AllCities;
+		System.out.println(String.format("Loaded %d cities", model.AllCities.size()));
+		//model.currentTour = Tour.GenerateRandom(model.AllCities);
+		frame = new ControlFrame(model);
+		bounder = new CityBounder(model);
+	}
 	
 	private void setup(){
-		//set = CitySet.GenerateRandom(500000);
-		//set = CitySet.LoadFromUrl("https://files.nyu.edu/ck1456/public/hps/tsp/usa115475.tsp");
-		set = CitySet.LoadFromUrl("https://files.nyu.edu/ck1456/public/hps/tsp/data/sample_1.tsp");
-		tour = Tour.GenerateRandom(set);
 		
-		System.out.println(String.format("Loaded %d cities", set.size()));
-		addMouseListener(this);
+		addMouseListener(bounder);
+		addMouseMotionListener(bounder);
+		
+		
 	}
 	
 	/**
@@ -77,40 +88,16 @@ public class MapApplet extends Applet implements Runnable, MouseListener {
 		g.setColor(Color.black);
 		g.fillRect(0, 0, width, height);
 		
-
+		CitySet set = model.currentCities;
 		if(set != null){
 			set.render(g, new Rectangle(width, height));
 		}
+		Tour tour = model.currentTour;
 		if(tour != null){
 			tour.render(g, new Rectangle(width, height));
 		}
+		bounder.render(g, new Rectangle(width, height));
 		
 	}
-
-	@Override
-	public void mouseClicked(MouseEvent arg0) {
-		tour = Tour.GenerateRandom(set);
-	}
-
-	@Override
-	public void mouseEntered(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void mouseExited(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void mousePressed(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void mouseReleased(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-	}
-	
 
 }
