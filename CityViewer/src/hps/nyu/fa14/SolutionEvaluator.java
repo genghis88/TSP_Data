@@ -66,7 +66,6 @@ public class SolutionEvaluator {
       	int cityId = Integer.parseInt(comps[0]);
       	sample.put(cityId,false);
         sb.append(line);
-        sb.append(System.lineSeparator());
         line = br.readLine();
       }
       String everything = sb.toString();
