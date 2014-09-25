@@ -19,40 +19,42 @@ public class CityBounder implements MouseListener, MouseMotionListener {
 	java.awt.Point currentPoint;
 	private boolean isDown;
 
+	private AbstractPointTranslator trans;
+
 	public void render(Graphics g, Rectangle r) {
 
 		// Find the bounds
-		// Bounds b = model.currentCities.getBounds();
-		// Bounds target = new Bounds();
-		// target.xMax = r.getMaxX();
-		// target.xMin = r.getMinX();
-		// target.yMax = r.getMaxY();
-		// target.yMin = r.getMinY();
+		Bounds b = model.getCurrentCities().getBounds();
+		Bounds target = new Bounds();
+		target.xMax = r.getMaxX();
+		target.xMin = r.getMinX();
+		target.yMax = r.getMaxY();
+		target.yMin = r.getMinY();
 
 		g.setColor(Color.green);
 
-		// AbstractPointTranslator trans = new PointTranslator(b, target, null);
-		// trans = new MirrorXYPointTranslator(target, trans);
+		trans = new PointTranslator(b, target, null);
+		trans = new MirrorXYPointTranslator(target, trans);
 
 		if (startPoint != null && currentPoint != null) {
-			g.drawRect(startPoint.x, startPoint.y, currentPoint.x
-					- startPoint.x, currentPoint.y - startPoint.y);
+			int x = Math.min(startPoint.x, currentPoint.x);
+			int y = Math.min(startPoint.y, currentPoint.y);
+			int w = Math.abs(currentPoint.x - startPoint.x);
+			int h = Math.abs(currentPoint.y - startPoint.y);
+			g.drawRect(x, y, w, h);
 		}
 	}
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		//model.currentTour = Tour.GenerateRandom(model.currentCities);
 	}
 
 	@Override
 	public void mouseEntered(MouseEvent e) {
-		// TODO Auto-generated method stub
 	}
 
 	@Override
 	public void mouseExited(MouseEvent e) {
-		// TODO Auto-generated method stub
 	}
 
 	@Override
@@ -64,22 +66,48 @@ public class CityBounder implements MouseListener, MouseMotionListener {
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		isDown = false;
-
 		// Find all the points in this region
-		
+		model.setCurrentCities(getCurrentCapturedCities());
+		model.currentTour = null;
+		currentPoint = null;
+		startPoint = null;
+	}
+
+	private CitySet getCurrentCapturedCities() {
+		System.out
+				.println("Current Bounds: " + model.getCurrentCities().getBounds());
+
+		Point p1 = trans.getSourcePoint(new Point(currentPoint.x,
+				currentPoint.y));
+		Point p2 = trans.getSourcePoint(new Point(startPoint.x, startPoint.y));
+
+		Bounds b = new Bounds();
+		b.xMin = Math.min(p1.x, p2.x);
+		b.xMax = Math.max(p1.x, p2.x);
+		b.yMin = Math.min(p1.y, p2.y);
+		b.yMax = Math.max(p1.y, p2.y);
+
+		System.out.println("Captured Bounds: " + b);
+		CitySet newSet = new CitySet();
+		for (City c : model.getCurrentCities()) {
+			if (c.X > b.xMin && c.X < b.xMax && c.Y > b.yMin && c.Y < b.yMax) {
+				newSet.addCity(c);
+			}
+		}
+		System.out.println(String.format("Captured %d cities", newSet.size()));
+		return newSet;
 	}
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		// TODO Auto-generated method stub
 		if (isDown) {
 			currentPoint = e.getPoint();
+			// getCurrentCapturedCities();
 		}
 	}
 
 	@Override
 	public void mouseMoved(MouseEvent e) {
-		
 	}
 
 }

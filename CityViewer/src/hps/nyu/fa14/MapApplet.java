@@ -5,9 +5,6 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Rectangle;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 
 /**
  * Double buffering concept from Ken Perlin's Computer Graphics class
@@ -62,21 +59,17 @@ public class MapApplet extends Applet implements Runnable {
 	private CityBounder bounder;
 	
 	public MapApplet(){
-//		model = new ProblemModel(CitySet.LoadFromUrl("https://files.nyu.edu/ck1456/public/hps/tsp/usa115475.tsp"));
-		model = new ProblemModel(CitySet.LoadFromUrl("https://files.nyu.edu/ck1456/public/hps/tsp/data/sample_5.tsp"));
-		model.currentCities = model.AllCities;
+		model = new ProblemModel(CitySet.LoadFromUrl("https://files.nyu.edu/ck1456/public/hps/tsp/usa115475.tsp"));
 		System.out.println(String.format("Loaded %d cities", model.AllCities.size()));
-		//model.currentTour = Tour.GenerateRandom(model.AllCities);
 		frame = new ControlFrame(model);
+		model.addViewer(frame);
+		model.setCurrentCities(model.AllCities);
 		bounder = new CityBounder(model);
 	}
 	
 	private void setup(){
-		
 		addMouseListener(bounder);
 		addMouseMotionListener(bounder);
-		
-		
 	}
 	
 	/**
@@ -88,7 +81,7 @@ public class MapApplet extends Applet implements Runnable {
 		g.setColor(Color.black);
 		g.fillRect(0, 0, width, height);
 		
-		CitySet set = model.currentCities;
+		CitySet set = model.getCurrentCities();
 		if(set != null){
 			set.render(g, new Rectangle(width, height));
 		}
@@ -97,7 +90,6 @@ public class MapApplet extends Applet implements Runnable {
 			tour.render(g, new Rectangle(width, height));
 		}
 		bounder.render(g, new Rectangle(width, height));
-		
 	}
 
 }

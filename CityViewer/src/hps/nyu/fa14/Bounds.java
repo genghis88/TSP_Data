@@ -21,5 +21,10 @@ public class Bounds {
 		c.y = yMin + (yDiff() / 2.0);
 		return c;
 	}
+	
+	@Override
+	public String toString(){
+		return String.format("X = %f:%f Y = %f:%f", xMin, xMax, yMin, yMax);
+	}
 }
 
