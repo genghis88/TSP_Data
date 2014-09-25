@@ -25,7 +25,7 @@
 			</manifest>
 		</jar>
 
-		<signjar jar="${project.home}/CityViewer.jar" alias="${key.alias}" storepass="${key.storepass}" />
+		<!--<signjar jar="${project.home}/CityViewer.jar" alias="${key.alias}" storepass="${key.storepass}" />-->
 
 	</target>
 
@@ -33,6 +33,14 @@
 		<jar destfile="${project.home}/SimpleTraveler.jar" baseDir="${project.home}/bin">
 			<manifest>
 				<attribute name="Main-Class" value="hps.nyu.fa14.SimpleTraveler" />
+			</manifest>
+		</jar>
+	</target>
+
+	<target name="evaluatorjar" depends="compile">
+		<jar destfile="${project.home}/tsp.jar" baseDir="${project.home}/bin">
+			<manifest>
+				<attribute name="Main-Class" value="hps.nyu.fa14.SolutionEvaluator" />
 			</manifest>
 		</jar>
 	</target>
