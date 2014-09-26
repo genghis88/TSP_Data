@@ -5,3 +5,8 @@ then
 else
   timeout 120s $1 $2 $3
 fi
+
+if [ -e $3 ]
+then
+  java -jar tsp.jar $2 $3
+fi
