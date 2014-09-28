@@ -21,6 +21,8 @@ public class CityBounder implements MouseListener, MouseMotionListener {
 
 	private AbstractPointTranslator trans;
 
+	private boolean circularMode = true;
+
 	public void render(Graphics g, Rectangle r) {
 
 		// Find the bounds
@@ -41,7 +43,12 @@ public class CityBounder implements MouseListener, MouseMotionListener {
 			int y = Math.min(startPoint.y, currentPoint.y);
 			int w = Math.abs(currentPoint.x - startPoint.x);
 			int h = Math.abs(currentPoint.y - startPoint.y);
-			g.drawRect(x, y, w, h);
+			if (circularMode) {
+				int radius = (int) Math.sqrt(w * w + h * h);
+				g.drawOval(x - radius, y - radius, 2 * radius, 2 * radius);
+			} else {
+				g.drawRect(x, y, w, h);
+			}
 		}
 	}
 
@@ -67,15 +74,19 @@ public class CityBounder implements MouseListener, MouseMotionListener {
 	public void mouseReleased(MouseEvent e) {
 		isDown = false;
 		// Find all the points in this region
-		model.setCurrentCities(getCurrentCapturedCities());
+		if (circularMode) {
+			model.setCurrentCities(getCurrentCapturedCitiesCircle());
+		} else {
+			model.setCurrentCities(getCurrentCapturedCitiesBox());
+		}
 		model.currentTour = null;
 		currentPoint = null;
 		startPoint = null;
 	}
 
-	private CitySet getCurrentCapturedCities() {
-		System.out
-				.println("Current Bounds: " + model.getCurrentCities().getBounds());
+	private CitySet getCurrentCapturedCitiesBox() {
+		System.out.println("Current Bounds: "
+				+ model.getCurrentCities().getBounds());
 
 		Point p1 = trans.getSourcePoint(new Point(currentPoint.x,
 				currentPoint.y));
@@ -98,11 +109,43 @@ public class CityBounder implements MouseListener, MouseMotionListener {
 		return newSet;
 	}
 
+	private CitySet getCurrentCapturedCitiesCircle() {
+		System.out.println("Current Bounds: "
+				+ model.getCurrentCities().getBounds());
+
+		Point p1 = trans.getSourcePoint(new Point(currentPoint.x,
+				currentPoint.y));
+		Point p2 = trans.getSourcePoint(new Point(startPoint.x, startPoint.y));
+
+		Bounds b = new Bounds();
+		b.xMin = Math.min(p1.x, p2.x);
+		b.xMax = Math.max(p1.x, p2.x);
+		b.yMin = Math.min(p1.y, p2.y);
+		b.yMax = Math.max(p1.y, p2.y);
+
+		double radius = Math
+				.sqrt(b.xDiff() * b.xDiff() + b.yDiff() * b.yDiff());
+		System.out.println("Captured Bounds: " + b + " radius: " + radius);
+		City centerCity = new City(0, p2.x, p2.y);
+		CitySet newSet = new CitySet();
+		for (City c : model.getCurrentCities()) {
+			if (centerCity.distance(c) <= radius) {
+				newSet.addCity(c);
+			}
+		}
+		System.out.println(String.format("Captured %d cities", newSet.size()));
+		return newSet;
+	}
+
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		if (isDown) {
 			currentPoint = e.getPoint();
-			// getCurrentCapturedCities();
+			if (circularMode) {
+				getCurrentCapturedCitiesCircle();
+			} else {
+				getCurrentCapturedCitiesBox();
+			}
 		}
 	}
 

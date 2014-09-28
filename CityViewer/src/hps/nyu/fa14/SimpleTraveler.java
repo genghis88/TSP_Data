@@ -11,16 +11,12 @@ public class SimpleTraveler {
 	 */
 	public static void main(String[] args) throws IOException {
 		// Parse the first argument as the input file and the second as the output file
-		
 		if(args.length != 2){
 			usage();
 			System.exit(1);
 		}
-		
 		CitySet cities = CitySet.LoadFromUrl(new File(args[0]).toURI().toString());
-		
 		Tour.GenerateRandom(cities).saveTour(new FileOutputStream(new File(args[1])));
-		
 	}
 	
 	private static void usage(){
