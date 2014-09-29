@@ -24,9 +24,6 @@
 				<attribute name="Main-Class" value="hps.nyu.fa14.MapApplet" />
 			</manifest>
 		</jar>
-
-		<!--<signjar jar="${project.home}/CityViewer.jar" alias="${key.alias}" storepass="${key.storepass}" />-->
-
 	</target>
 
 	<target name="simplejar" depends="compile">
@@ -45,19 +42,14 @@
 		</jar>
 	</target>
 
-	<!--
-	<target name="genKeystore">
-		<mkdir dir="${build.output.dir}" />
-		<genkey alias="${verisign.key.alias}" verbose="true" storepass="${verisign.key.storepass}" keypass="${verisign.key.pass}" validity="365" keystore="${verisign.key.store}">
-			<dname>
-				<param name="CN" value="AsJava.com Group" />
-				<param name="OU" value="Jim" />
-				<param name="O" value="AsJava.com" />
-				<param name="C" value="US" />
-			</dname>
-		</genkey>
+	<target name="evaluatorjar2" depends="compile">
+		<jar destfile="${project.home}/tsp.jar" baseDir="${project.home}/bin">
+			<manifest>
+				<attribute name="Main-Class" value="hps.nyu.fa14.SolutionEvaluator2" />
+			</manifest>
+		</jar>
 	</target>
--->
+
 	<target name="genKey">
 		<genkey alias="${key.alias}" verbose="true" storepass="${key.storepass}">
 			<dname>

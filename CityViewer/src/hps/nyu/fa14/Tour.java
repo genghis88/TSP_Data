@@ -11,8 +11,10 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 public class Tour {
 
@@ -25,12 +27,27 @@ public class Tour {
 	}
 
 	public void addCity(int id) {
+		City c = cities.getCity(id);
+		if(c == null){
+			throw new RuntimeException(String.format("Invalid City id: %d", id));
+		}
 		tour.add(cities.getCity(id));
 	}
 
 	public boolean isValidPermutation() {
 
-		return false;
+		Set<Integer> cityIds = new HashSet<Integer>();
+		for(City c : cities){
+			cityIds.add(c.ID);
+		}
+		for(City c : tour){
+			// Assert each city was in the original city list (at most once)
+			if(!cityIds.remove(c.ID)){
+				return false;
+			}
+		}
+		// Assert every city is used
+		return cityIds.size() == 0;
 	}
 
 	public double evaluate(){
