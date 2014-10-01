@@ -43,14 +43,10 @@ class ControlFrame implements IModelViewer {
 		solutionText = new JTextArea();
 		solutionText.setAlignmentX(Component.LEFT_ALIGNMENT);
 		solutionText.setSize(100, 100);
-
-		
 		
 		lengthValueLabel = new JLabel("Not Set");
 		
 		mainPanel.add(getTourPanel());
-
-		
 
 		// Setup complete, show it
 		mainFrame.add(mainPanel);
