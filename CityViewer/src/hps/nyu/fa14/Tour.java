@@ -3,29 +3,72 @@ package hps.nyu.fa14;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 public class Tour {
 
 	private final List<City> tour = new ArrayList<City>();
 
 	private final CitySet cities;
-	
-	public Tour(CitySet cities){
+
+	public Tour(CitySet cities) {
 		this.cities = cities;
 	}
-	
+
 	public void addCity(int id) {
+		City c = cities.getCity(id);
+		if(c == null){
+			throw new RuntimeException(String.format("Invalid City id: %d", id));
+		}
 		tour.add(cities.getCity(id));
 	}
 
 	public boolean isValidPermutation() {
 
-		return false;
+		Set<Integer> cityIds = new HashSet<Integer>();
+		for(City c : cities){
+			cityIds.add(c.ID);
+		}
+		for(City c : tour){
+			// Assert each city was in the original city list (at most once)
+			if(!cityIds.remove(c.ID)){
+				return false;
+			}
+		}
+		// Assert every city is used
+		return cityIds.size() == 0;
 	}
 
+	public double evaluate(){
+		double length = 0;
+		if(tour.size() <= 1){
+			return length;  // Nowhere to go
+		}
+		City lastCity = null;
+		
+		for(City c : tour){
+			if(lastCity != null){
+				length += lastCity.distance(c);
+			}
+			lastCity = c;
+		}
+		// finish the tour and return to the start city - we know the tour must have length > 1
+		length += lastCity.distance(tour.get(0));
+		return length;
+	}
+	
+	
 	public void render(Graphics g, Rectangle r) {
 
 		// Find the bounds
@@ -38,43 +81,74 @@ public class Tour {
 
 		g.setColor(Color.blue);
 
-		PointTranslator trans = new PointTranslator(b, target, null);
+		AbstractPointTranslator trans = new PointTranslator(b, target, null);
+		trans = new MirrorXYPointTranslator(target, trans);
 		for (int i = 0; i < tour.size(); i++) {
 			City c1 = tour.get(i);
 			City c2 = tour.get((i + 1) % tour.size()); // wrap around to one
 			Point p1 = trans.getDestPoint(new Point(c1.X, c1.Y));
 			Point p2 = trans.getDestPoint(new Point(c2.X, c2.Y));
-			g.drawLine((int)p1.x, (int)p1.y, (int)p2.x, (int)p2.y);
+			g.drawLine((int) p1.x, (int) p1.y, (int) p2.x, (int) p2.y);
 		}
 	}
-	
-	public static Tour GenerateRandom(CitySet cities){
-		
+
+	public static Tour GenerateRandom(CitySet cities) {
+
 		Tour newTour = new Tour(cities);
-	
+
 		Integer[] cityIds = new Integer[cities.size()];
 		int index = 0;
-		for(City c : cities){
+		for (City c : cities) {
 			cityIds[index++] = c.ID;
 		}
 		permute(cityIds);
-		for(int id : cityIds){
+		for (int id : cityIds) {
 			newTour.addCity(id);
 		}
-		
+
 		return newTour;
 	}
+
+	/**
+	 * Parses a newline-separated list of integer city ids into a well-formed
+	 * tour
+	 * 
+	 * @param tour
+	 * @param cities
+	 * @return
+	 */
+	public static Tour parseTour(InputStream tour, CitySet cities)
+			throws IOException {
+
+		Tour t = new Tour(cities);
+		BufferedReader br = new BufferedReader(new InputStreamReader(tour));
+
+		String line;
+		while ((line = br.readLine()) != null) {
+			int cityId = Integer.parseInt(line);
+			t.addCity(cityId);
+		}
+		return t;
+	}
 	
-    // Implements Fisher-Yates: http://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
-	private static <T> void permute(T[] input){
+	public void saveTour(OutputStream output) throws IOException{
+		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(output));
+		for(City c : this.tour){
+			bw.write(String.format("%d%n", c.ID));			
+		}
+		bw.close();
+	}
+
+	// Implements Fisher-Yates:
+	// http://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
+	private static <T> void permute(T[] input) {
 		Random rand = new Random();
-		for(int i = input.length - 1; i > 1; i--){
+		for (int i = input.length - 1; i > 1; i--) {
 			int swapIndex = rand.nextInt(i + 1);
 			T swapValue = input[swapIndex];
 			input[swapIndex] = input[i];
 			input[i] = swapValue;
 		}
 	}
-	
-	
+
 }

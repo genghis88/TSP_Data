@@ -1,0 +1,75 @@
+<project name="CityViewer" basedir="." default="package">
+
+	<property name="src.dir" value="src" />
+	<property name="build.dir" value="bin" />
+	<property name="project.home" location="." />
+
+	<target name="clean">
+		<delete dir="${build.dir}" />
+	</target>
+
+	<target name="compile">
+		<javac srcdir="${src.dir}" destdir="${build.dir}" compiler="modern" fork="true" includeantruntime="false" />
+	</target>
+
+	<property name="build.output.dir" value="C:\java_sign" />
+	<property name="key.store" value="${build.output.dir}/.keystore" />
+	<property name="key.storepass" value="myreallysecretpassword" />
+	<property name="key.alias" value="ck1456" />
+	<property name="key.pass" value="badass" />
+
+	<target name="createjar" depends="compile">
+		<jar destfile="${project.home}/CityViewer.jar" baseDir="${project.home}/bin">
+			<manifest>
+				<attribute name="Main-Class" value="hps.nyu.fa14.MapApplet" />
+			</manifest>
+		</jar>
+	</target>
+
+	<target name="simplejar" depends="compile">
+		<jar destfile="${project.home}/SimpleTraveler.jar" baseDir="${project.home}/bin">
+			<manifest>
+				<attribute name="Main-Class" value="hps.nyu.fa14.SimpleTraveler" />
+			</manifest>
+		</jar>
+	</target>
+
+	<target name="evaluatorjar" depends="compile">
+		<jar destfile="${project.home}/tsp.jar" baseDir="${project.home}/bin">
+			<manifest>
+				<attribute name="Main-Class" value="hps.nyu.fa14.SolutionEvaluator" />
+			</manifest>
+		</jar>
+	</target>
+
+	<target name="evaluatorjar2" depends="compile">
+		<jar destfile="${project.home}/tsp.jar" baseDir="${project.home}/bin">
+			<manifest>
+				<attribute name="Main-Class" value="hps.nyu.fa14.SolutionEvaluator2" />
+			</manifest>
+		</jar>
+	</target>
+
+	<target name="genKey">
+		<genkey alias="${key.alias}" verbose="true" storepass="${key.storepass}">
+			<dname>
+				<param name="CN" value="Chris Keitel" />
+				<param name="OU" value="NYU-HPS" />
+				<param name="O" value="NYU" />
+				<param name="C" value="US" />
+			</dname>
+		</genkey>
+	</target>
+
+
+	<property name="zip.name" value="CityViewer" />
+	<target name="package" depends="createjar">
+		<echo>Zipping...</echo>
+		<zip destfile="dist/${zip.name}.zip">
+			<zipfileset dir="." includes="index.html" prefix="${zip.name}" />
+			<zipfileset dir="src" includes="*.java" prefix="${zip.name}" excludes="test*.java" />
+			<zipfileset dir="bin" includes="*.class" prefix="${zip.name}" excludes="test*.class" />
+		</zip>
+	</target>
+
+</project>

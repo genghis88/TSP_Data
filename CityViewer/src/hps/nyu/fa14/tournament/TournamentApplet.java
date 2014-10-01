@@ -1,4 +1,4 @@
-package hps.nyu.fa14;
+package hps.nyu.fa14.tournament;
 
 import java.applet.Applet;
 import java.awt.Color;
@@ -11,7 +11,7 @@ import java.awt.Rectangle;
  * 
  * @author ck1456@nyu.edu
  */
-public class MapApplet extends Applet implements Runnable {
+public class TournamentApplet extends Applet implements Runnable {
 
 	private static final long serialVersionUID = 4901830364284199595L;
 
@@ -52,24 +52,17 @@ public class MapApplet extends Applet implements Runnable {
 		}
 	}
 	
-	private final ProblemModel model;
+	private final TournamentControl frame;
+	private final TournamentModel model;
 	
-	private final ControlFrame frame;
-	
-	private CityBounder bounder;
-	
-	public MapApplet(){
-		model = new ProblemModel(CitySet.LoadFromUrl("https://files.nyu.edu/ck1456/public/hps/tsp/usa115475.tsp"));
-		System.out.println(String.format("Loaded %d cities", model.AllCities.size()));
-		frame = new ControlFrame(model);
-		model.addViewer(frame);
-		model.setCurrentCities(model.AllCities);
-		bounder = new CityBounder(model);
+	public TournamentApplet(){
+		model = new TournamentModel();
+		model.refreshTests();
+		frame = new TournamentControl(model);
 	}
 	
 	private void setup(){
-		addMouseListener(bounder);
-		addMouseMotionListener(bounder);
+		model.refreshTeams();
 	}
 	
 	/**
@@ -81,15 +74,7 @@ public class MapApplet extends Applet implements Runnable {
 		g.setColor(Color.black);
 		g.fillRect(0, 0, width, height);
 		
-		CitySet set = model.getCurrentCities();
-		if(set != null){
-			set.render(g, new Rectangle(width, height));
-		}
-		Tour tour = model.currentTour;
-		if(tour != null){
-			tour.render(g, new Rectangle(width, height));
-		}
-		bounder.render(g, new Rectangle(width, height));
+		model.render(g, new Rectangle(width, height));
 	}
 
 }

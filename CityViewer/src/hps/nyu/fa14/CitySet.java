@@ -4,8 +4,12 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -48,7 +52,8 @@ public class CitySet implements Iterable<City> {
 		
 		g.setColor(Color.red);
 
-		PointTranslator trans = new PointTranslator(b, target, null);
+		AbstractPointTranslator trans = new PointTranslator(b, target, null);
+		trans = new MirrorXYPointTranslator(target, trans);
 		for (City c : this) {
 			Point p = trans.getDestPoint(new Point(c.X, c.Y));
 			g.fillOval((int)p.x - 2, (int)p.y - 2, 4, 4);
@@ -69,6 +74,14 @@ public class CitySet implements Iterable<City> {
 			b.yMax = Math.max(b.yMax, c.Y);
 		}
 		return b;
+	}
+	
+	public void saveCities(OutputStream output) throws IOException{
+		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(output));
+		for(City c : this.cities.values()){
+			bw.write(String.format("%d %f %f%n", c.ID, c.Y, c.X));			
+		}
+		bw.close();
 	}
 
 	public static CitySet GenerateRandom(int count) {
@@ -94,8 +107,9 @@ public class CitySet implements Iterable<City> {
 				String[] parts = line.split("\\s");
 				try{
 					int id = Integer.parseInt(parts[0]);
-					double x = Double.parseDouble(parts[1]);
-					double y = Double.parseDouble(parts[2]);
+					// Everything seems to make more sense if we interpret the first coordinate as Y
+					double y = Double.parseDouble(parts[1]);
+					double x = Double.parseDouble(parts[2]);
 					set.addCity(new City(id, x, y));
 				} catch (Exception ex){
 					// just continue
