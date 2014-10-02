@@ -112,7 +112,23 @@ public class TournamentModel {
 	}
 
 	public void scoreTeams() {
-
+		for(String testFileName:testFileNames) {
+		    double minTour = Double.MAX_VALUE;
+		    for(Team team:teams) {
+		    	double teamTour = team.getResults(testFileName);
+		    	if(teamTour < minTour) {
+		    		minTour = teamTour;
+		    	}
+		    }
+		    for(Team team:teams) {
+		    	double teamTour = team.getResults(testFileName);
+		    	double rank = (teamTour / minTour);
+		    	if(Double.isNaN(rank)) {
+		    		rank = 1.5;
+		    	}
+		    	team.setRank(testFileName, rank);
+		    }
+	    }
 	}
 	
 	private final List<IModelViewer> viewers = new ArrayList<IModelViewer>();

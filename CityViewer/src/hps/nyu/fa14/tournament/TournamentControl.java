@@ -21,6 +21,7 @@ class TournamentControl implements IModelViewer {
 	private final TournamentModel model;
 	private final JFrame mainFrame;
 	private final JPanel leaderboard;
+	private final JPanel totalboard;
 
 	TournamentControl(TournamentModel model) {
 		this.model = model;
@@ -35,7 +36,22 @@ class TournamentControl implements IModelViewer {
 
 		leaderboard = new JPanel();
 		mainPanel.add(leaderboard);
-
+		
+		JButton totalsButton = new JButton("Show Totals");
+		{
+			totalsButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					setupTotalboard();
+				}
+			});
+			totalsButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+			mainPanel.add(totalsButton);
+		}
+		
+		totalboard = new JPanel();
+		mainPanel.add(totalboard);
+		
 		setupLeaderboard();
 
 		// Setup complete, show it
@@ -81,6 +97,30 @@ class TournamentControl implements IModelViewer {
 		return testPanel;
 	}
 
+	private void setupTotalboard() {
+		totalboard.removeAll();
+		totalboard.setLayout(new BoxLayout(totalboard, BoxLayout.Y_AXIS));
+		totalboard.setAlignmentX(Component.LEFT_ALIGNMENT);
+		totalboard.setAlignmentY(Component.TOP_ALIGNMENT);
+
+		totalboard.add(new JLabel("Totals:"));
+
+		List<Team> teams = new ArrayList<Team>(model.teams);
+		Collections.sort(teams, new Comparator<Team>() {
+			@Override
+			public int compare(Team t1, Team t2) {
+				return t1.getTotalRank().compareTo(
+						t2.getTotalRank());
+			}
+		});
+		
+		for(Team t: teams){
+			totalboard.add(new JLabel(String.format("%s   %f", t.name, t.getTotalRank())));
+		}
+		mainFrame.getContentPane().validate();
+		mainFrame.getContentPane().repaint();
+	}
+	
 	private void setupLeaderboard() {
 
 		leaderboard.removeAll();

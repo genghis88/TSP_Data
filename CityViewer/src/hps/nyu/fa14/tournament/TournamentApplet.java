@@ -63,6 +63,7 @@ public class TournamentApplet extends Applet implements Runnable {
 	
 	private void setup(){
 		model.refreshTeams();
+		model.scoreTeams();
 	}
 	
 	/**

@@ -46,6 +46,10 @@ public class Team {
 		return 1.5;
 	}
 	
+	public void setRank(String testFileName,double rank){
+		this.rank.put(testFileName, rank);
+	}
+	
 	public Double getResults(String testFileName){
 		if(results.containsKey(testFileName)){
 			return results.get(testFileName);
@@ -56,5 +60,13 @@ public class Team {
 	
 	public String roundDetail(String testFileName){
 		return String.format("%f   %s   %f", getRank(testFileName), name, getResults(testFileName));
+	}
+	
+	public Double getTotalRank() {
+		double totalRank = 0.0;
+		for(Double r:rank.values()) {
+			totalRank += r;
+		}
+		return totalRank;
 	}
 }
