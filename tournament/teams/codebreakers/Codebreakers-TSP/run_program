@@ -9,6 +9,4 @@ fi
 if [ -e $3 ]
 then
   java -jar tsp.jar $2 $3
-else
-  echo "$3 not created"
 fi

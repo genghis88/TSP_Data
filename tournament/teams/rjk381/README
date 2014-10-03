@@ -1,0 +1,10 @@
+Ryan Keavney
+HPS - TSP Solver
+
+build:
+make
+
+run:
+./tspsolver <input> <output>
+
+

@@ -40,6 +40,9 @@ public class Team {
 	
 	public Double getRank(String testFileName){
 		if(rank.containsKey(testFileName)){
+			if(rank.get(testFileName) < 0) {
+				return 1.5; //default if something has gone wrong
+			}
 			return rank.get(testFileName);
 		}
 		// else return default

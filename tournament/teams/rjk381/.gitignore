@@ -1,0 +1,8 @@
+obj/
+tspdriver
+*.swp
+output*
+*.tsp
+*.out
+*.txt
+
